@@ -1,0 +1,175 @@
+<html>
+<head>
+    <title>Dashboard</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <link rel="stylesheet" href="{{url_for('static', filename='css/index.css')}}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script> 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script type="text/javascript">
+        function loading(){
+            $("#loading").show();
+            $("#content").hide();       
+        }
+    </script>
+    </head>
+
+    <body>
+
+        <nav class="navbar fixed-top navbar-dark bg-dark" >
+            <div class="container">
+              <a class="navbar-brand text-muted" href="#" style = "color: #FFFFFF !important;">Baidu Ventures</a>
+                  <ul class="nav navbar-nav navbar-right" style="display: inline-block;">
+                    <div class="button" id="button-2" onclick="document.getElementById('id01').style.display='block'">
+                        <div id="slide"></div>
+                        <a href="#">Run Scraper</a>
+                    </div>
+                    <div class="button" id="button-2" onclick="window.location.href='{{ url_for( 'download' )}}';">
+                      <div id="slide"></div>
+                      <a href="{{url_for('download')}}">Download</a>
+                  </div>
+                  </ul>    
+             </div>
+        </nav>
+
+        <div class="container">   
+
+            <div id="id01" class="modal">
+                <div class="modal-dialog modal-login">
+                    <div class="modal-content">
+                        <div onclick="document.getElementById('id01').style.display='none'" title="Close Modal" style="width: 25px; height: 25px;">&times;</div>
+                        <div class= "form-group">
+                            <h1>Linkedin Authentication</h1>
+                        {% from "_formhelpers.html" import render_field %}
+                        <form method=post class="form form-horizontal">
+                                {{ render_field(linkedin.email, class = "form-control") }}
+                                {{ render_field(linkedin.password, class = "form-control")}}
+                                <input type=submit value=Submit class="btn btn-primary btn-lg m-0" onclick="document.getElementById('id01').style.display='none'; loading()">
+                        </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class= "form-group" style="margin-top: 60px;">
+                {% from "_formhelpers.html" import render_field %}
+                <form method=post class="form form-horizontal">
+                    {{ render_field(form.select, class = "form-control") }}
+                    <div class="wrap">
+                    <div class="search">
+                        {{ render_field(form.search, class = "searchTerm")}}
+                    <button type=submit value=Filter class="searchButton">
+                        <i class="fa fa-search"></i>
+                    </button>
+                    </div>
+                    </div>
+                </form>
+            </div>
+
+            <div id="loading"></div>
+            
+            <div class="container-fluid">
+                {%if error == 1%}   
+                <div class="alert alert-warning alert-dismissible" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button> 
+                Linkedin Authentication was incorrect!
+                </div>        
+                {% endif %} 
+            </div>
+
+            <div class="table table-responsive">
+                <table  class="table table-striped table-bordered"  style="width:100%; font-size: 12px; font-family: 'Segoe UI';">
+                <thead>
+                    <tr>
+                        <th style="text-align: center;">Date</th>                    
+                        <th style="text-align: center;">Name</th>
+                        <th style="text-align: center;">Current Company</th>
+                        <th style="text-align: center;">Past Companies</th>
+                        <th style="text-align: center;">Education</th>
+                        <th style="text-align: center;">Added By</th>
+                        <th style="text-align: center;">Reached Out</th>                    
+                    </tr>
+                </thead>
+                <tbody>
+                {% for founder in founders.items %}
+                    <tr>
+                        <td><div style="width:100px; text-align: center;">{{founder.date}}</div></td>
+                        <td><div style="width:150px; text-align: center;"><a href = {{founder.link}} target="_blank" style = "color: black !important;">{{ founder.fullname}}</a></div></td>
+                        <td><div style="width:300px; text-align: center;">{{ founder.current_company}}</div></td>
+                        <td><div style="width:300px; ">
+                            <ul>
+                            {% for past_company in founder.past_company.split("'")[1::2]%}
+                            {% if "Not Found" not in past_company%}
+                            <li>{{past_company}}</li>
+                            {%endif%}
+                            {%endfor%}
+                            </ul>
+                        </div></td>
+                        <td><div style="width:300px; ">
+                            <ul>
+                                {% for education in founder.education.split("'")[1::2]%}
+                                {% if "]" not in education %}
+                                {% if "Not Found" not in education %}
+                                <li>{{education}}</li>
+                                {%endif%}
+                                {%endif%}
+                                {%endfor%}
+                                </ul>
+                        </div></td>
+                        <td><div style="width:150px; text-align: center;">{{founder.added_by}}</div></td>
+                        <td>
+                            <div style="width:100px; text-align: center;">
+                                <form action="{{ url_for('reached', page_num=page, token = token) }}" method="POST">
+                                    <input id="reached" name="reached" type="hidden" value="{{founder.id}}">
+                                    {% if founder.send_email == 1 %}
+                                    <div >
+                                        <button type=submit style = "display: inline-block; background: #D0F0C0; border-radius: 20px; justify-content: center; align-items: center; display: flex; width:80px; ">
+                                        <div class="btn-text" style="border:none; color: #FFFFFF; font-size: 15px;">Yes</div>
+                                        </button>
+                                    </div>
+                                        
+                                    {% else %}
+                                    <div >
+                                    <button type=submit style = "display: inline-block; background: #FA8072; border-radius: 20px; justify-content: center; align-items: center; display: flex; width:80px; ">
+                                    <div class="btn-text" style="border:none ; color: #FFFFFF; font-size: 15px;">No</div>
+                                    </button>
+                                </div>
+                                        
+                                    {% endif %}
+
+                                </form>
+                            </div>  
+                        </td>   
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                </table>
+            </div>
+      
+            <ul class="pagination">
+                {% if founders.has_prev %}
+                <li class="page-item"><a class="page-link" href="{{ url_for('founders', page_num=founders.prev_num, token = token) }}">Previous</a></li>
+                {% else %}
+                <li class="page-item disabled"><span class="page-link">Previous</span>
+                {% endif %}
+                </li>    
+                {% for page in founders.iter_pages(left_edge=3, right_edge=3) %}
+                {% if page %}
+                <li class="page-item"><a class="page-link" href="{{ url_for('founders', page_num=page, token = token) }}">{{page}}</a></li>
+                {% else %}
+                <li class="page-item disabled" id="example_ellipsis"><a href="#" class="page-link">…</a></li> 
+                {% endif %}
+                {% endfor %}
+                
+                {% if founders.has_next %}
+                <li class="page-item"><a class="page-link" href="{{ url_for('founders', page_num=founders.next_num, token = token) }}">Next</a></li>
+                {% else %}
+                <li class="page-item disabled"><span class="page-link">Next</span>
+                {% endif %}
+            </ul>
+            
+        </div>
+     
+    </body>
+</html>

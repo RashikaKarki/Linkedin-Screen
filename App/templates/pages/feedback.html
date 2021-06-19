@@ -1,0 +1,44 @@
+<html>
+  
+<head>
+    <title>Baidu Ventures</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <link rel="stylesheet" href="{{url_for('static', filename='css/index.css')}}"> 
+</head>
+
+<style>
+  body{
+    margin-top: 150px;
+    background-color: #C4CCD9;
+  }
+  .error-main{
+    background-color: #fff;
+    box-shadow: 0px 10px 10px -10px #5D6572;
+  }
+  .error-main h2{
+    color: #42494F;
+  }
+</style>
+
+<body>
+
+    <nav class="navbar fixed-top navbar-dark bg-dark" >
+        <div class="container">
+          <a class="navbar-brand text-muted" href="#" style = "color: #FFFFFF !important;">Baidu Ventures</a>   
+         </div>
+    </nav>
+
+    <div class="container">
+        <div class="row text-center">
+          <div class="col-lg-6 offset-lg-3 col-sm-6 offset-sm-3 col-12 p-3 error-main">
+            <div class="row">
+              <div class="col-lg-8 col-12 col-sm-10 offset-lg-2 offset-sm-1">
+                <h2>{{feedback}}</h2>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+</body>
+</html>
